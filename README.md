@@ -1,4 +1,4 @@
-# A Financial Fraud Detection Graph Use Case
+# A Financial Fraud Detection Graph Use Case (at scale)
 
 ![Deep Fraud Ring](renderings/deep_fraud_ring_graph.png)
 
