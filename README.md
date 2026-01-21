@@ -1,4 +1,4 @@
-# A Financial Fraud Detection Graph Use Case (at scale)
+# Financial Fraud Topologies using Graphs & Neo4j
 
 ![Deep Fraud Ring](renderings/deep_fraud_ring_graph.png)
 
