@@ -1,6 +1,11 @@
 # Financial Fraud Topologies using Graphs & Neo4j
 
-![Deep Fraud Ring](renderings/deep_fraud_ring_graph.png)
+<p align="center">
+  <img src="renderings/deep_fraud_ring_graph.png" alt="Deep Fraud Ring" width="600px" />
+  <br>
+  <sub>A complex fraud ring showing interconnected fraudulent transactions, cards, and devices.</sub>
+</p>
+
 
 This repository demonstrates how to create a **Financial Fraud Detection** graph in Neo4j using the [IEEE-CIS Fraud Detection dataset](https://www.kaggle.com/c/ieee-fraud-detection). 
 
@@ -8,7 +13,11 @@ By combining transaction details with identity information, the graph helps orga
 
 This is a classic use case for financial institutions looking to evolve from reactive "individual transaction analysis" to a proactive, network-based fraud management strategy.
 
-![Fraud Islands](renderings/fraud_island_graph.png)
+<p align="center">
+  <img src="renderings/fraud_island_graph.png" alt="Fraud Islands" width="600px" />
+  <br>
+  <sub>Tightly connected groups of fraudulent activity, known as "Fraud Islands."</sub>
+</p>
 
 This example includes two main notebooks:
 
@@ -42,6 +51,12 @@ In this example, we integrate two primary tables from the IEEE-CIS dataset to bu
 
 ### The Graph Advantage
 
+<p align="center">
+  <img src="renderings/mule_path_graph.png" alt="Mule Fraud Path" width="600px" />
+  <br>
+  <sub>The path of fraudulent transactions through mule cards and devices.</sub>
+</p>
+
 Traditional fraud management relies on flat lists and rules (e.g., "Amount > $10,000"), which often lead to high false positive rates because they treat a legitimate big spender the same as a thief.
 
 By using Neo4j, we can perform **Link Analysis** to answer critical questions:
@@ -54,7 +69,11 @@ By using Neo4j, we can perform **Link Analysis** to answer critical questions:
 
 With the data loaded, our graph schema looks like the following:
 
-![Fraud Graph Schema](renderings/schema_graph.png)
+<p align="center">
+  <img src="renderings/schema_graph.png" alt="Fraud Graph Schema" width="600px" />
+  <br>
+  <sub>High-level overview of the Fraud Detection Graph Schema.</sub>
+</p>
 
 We include nodes for **Transactions**, **Cards**, **Devices**, **Emails**, and **Addresses**. The relationships capture the action of a transaction utilizing these resources.
 
