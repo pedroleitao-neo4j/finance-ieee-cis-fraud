@@ -267,8 +267,8 @@ graph TD
 
 ### Compliance and Data Governance
 
-In a banking environment, the architecture must account for:
+In a banking environment (highly regulated), the architecture should account for:
 
-* **PII Masking:** Using one-way hashes (MD5/SHA256) for Card Numbers (PANs) and SSNs before they enter the graph.
+* **PII Masking:** Using, for example, one-way hashes (MD5/SHA256) for Card Numbers (PANs) and SSNs as well as other PII data before they enter the graph. Pseudonymization ensures compliance with data protection regulations.
 * **Right to Erasure (GDPR):** Automated scripts to prune customer nodes and their relationships upon request.
 * **Explainability:** Storing the "Path of Reason" (e.g., *Why was this flagged?*) as a property on the transaction so that the bank can provide a clear reason for declining a payment if challenged by the customer.
