@@ -62,8 +62,8 @@ Traditional fraud management relies on flat lists and rules (e.g., "Amount > $10
 By using Neo4j, we can perform **Link Analysis** to answer critical questions:
 
 * **Reachability:** Is this fresh credit card actually linked to a device previously used for fraud?
-* **Impact:** If this account is comprised, how many other accounts share its recovery email?
-* **Efficiency:** Which "Supernodes" (e.g., a specific IP address) are hubs for 90% of our fraudulent activity?
+* **Impact:** If this account is compromised, how many other accounts share its recovery email?
+* **Efficiency:** Which "Supernodes" (e.g., a specific device) are hubs for 90% of our fraudulent activity?
 
 ### The Resulting Schema
 
@@ -103,27 +103,172 @@ Schema outline in Cypher:
 (:Transaction)-[:BILLED_TO]->(:Address)
 ```
 
-## Architecture
+This is a strong architectural foundation. To transition this from a data science project to a **Production Banking Architecture**, you need to define how the Graph Intelligence Layer interacts with the **Core Banking System (CBS)**, the **Payment Switch**, and the **Case Management System (CMS)**.
 
-### Overview
+Here is the extended documentation covering placement, integration, and banking-specific workflows.
 
-In our solution, the system is built on a **Fraud Knowledge Graph** architecture. Unlike traditional relational databases that struggle with many-to-many relationships (e.g., finding a path from a Transaction to a Device to a different Card), Neo4j allows us to map the complex relationships between payments, identities, and infrastructure in real-time.
+## Extended Architecture: Enterprise Banking Integration
 
-### Typical Data Flow
+### Placement in the Banking Ecosystem
 
-The architecture follows a standard **Extract, Load, Transform (ELT)** pattern tailored for graph structures:
+In a modern banking stack, the Fraud Knowledge Graph extends the Core Banking System; it acts as an **Intelligence Layer** that sits between or alongside transaction processing and risk operations.
 
-1. **Ingestion (Python):** We load the raw CSV data using `pandas` and the Neo4j Python Driver.
-2. **Entity Resolution (Neo4j MERGE):** Data is streamed into Neo4j using `MERGE` logic. This ensures that if a Device ID appears in 1,000 transactions, it is represented as a single node with 1,000 incoming relationships, instantly revealing its importance.
-3. **Contextual Enrichment:** Once the base nodes are loaded, we use Graph Data Science (GDS) to calculate metrics like **Community IDs** (identifying rings) and **PageRank** (identifying influential nodes).
-4. **Prioritization/Scoring:** The results can be visualized for analysts or fed back into ML models as new features (e.g., "Degree Centrality of associated Device").
+* **Upstream:** Core Banking Systems, Payment Gateways (ISO 20022 messages), and Digital Channel Telemetry (Mobile/Web logs).
+* **The Hub (The Graph):** Consolidates silos (KYC, Auth logs, Transaction history) into a unified entity-link model.
+* **Downstream:** Case Management Systems (for manual review) and Real-time Decision Engines (for automated block/allow).
 
-### Outward System Integration
+```mermaid
+graph TD
+    subgraph Upstream [Data Sources & Ingestion]
+        CBS[Core Banking Systems]
+        PGW[Payment Gateways<br/>ISO 20022]
+        TEL[Digital Telemetry<br/>Mobile/Web Logs]
+    end
 
-The Fraud graph acts as a **central nervous system** for investigation data. Its value is fully realized when insights are pushed back into the tools where analysts work.
+    subgraph Hub [Fraud Knowledge Graph]
+        direction TB
+        G[Entity-Link Model]
+        
+        subgraph Silos [Unified Context]
+            KYC[KYC Data]
+            AUTH[Auth Logs]
+            TX[Transaction History]
+        end
+        
+        Silos --> G
+    end
 
-#### Investigation Tools
-* **Visual Forensics:** Analysts can query Neo4j Bloom or similar tools to visually explore the "blast radius" of a flagged transaction.
+    subgraph Downstream [Decision & Operations]
+        CMS[Case Management<br/>Manual Review]
+        RDE[Real-time Decision Engine<br/>Auto Block/Allow]
+    end
 
-#### Real-time Scoring
-* **Feature Engineering:** Graph features (e.g., "Number of other cards used on this device in the last 24h") are often strong predictors for ML models (XGBoost/LightGBM) used in real-time authorization.
+    %% Connections
+    Upstream --> Hub
+    G --> Downstream
+
+    %% Styling
+    style Hub fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style G fill:#d1e7ff,stroke:#004a99,stroke-width:2px
+    style RDE fill:#ffcccc,stroke:#990000
+    style CMS fill:#fff2cc,stroke:#d6b656
+```
+
+### Integration Processes
+
+#### Real-Time Streaming (Hot Path)
+
+For immediate fraud prevention (e.g., blocking a wire transfer), the system integrates via a **Message Bus (Kafka/RabbitMQ/etc.)**:
+
+1. A transaction is initiated at the Payment Switch.
+2. A "Shadow Copy" of the transaction event is pushed to Kafka.
+3. A **Graph Sink Connector** ingests the event into Neo4j, updating the "Device-to-Card" relationships in milliseconds.
+4. The Graph calculates a "Network Risk Score" (e.g., *Is this card linked to a known fraudulent IP through 3 hops?*).
+5. This score is fed back to the Authorization Engine to approve or decline the transaction.
+
+#### Batch Enrichment (Cold Path)
+
+Historical data from **Data Lakes (Snowflake/Hadoop/etc.)** is synchronized nightly:
+
+* **Identity Resolution:** Merging customer profiles across different products (Checking, Credit, Mortgage) to find "First Party Fraud" or "Synthetic Identities."
+* **Backfilling:** Updating the graph with newly confirmed fraud labels from the "Chargeback" department to re-calculate community risk scores.
+
+#### Sequencing
+
+The following diagram illustrates the data flow and integration points:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Customer
+    participant Gateway as Payment Gateway / Switch
+    participant Kafka as Event Bus (Kafka)
+    participant Graph as Neo4j Graph Hub
+    participant RDE as Real-time Decision Engine
+    participant CMS as Case Management (Analysts)
+
+    Note over Customer, Gateway: [HOT PATH] Authorization ~200-500ms
+    Customer->>Gateway: Initiates Payment
+    Gateway->>Kafka: Emit Transaction Event
+    Kafka->>Graph: Upsert Transaction & Link Entities
+    
+    rect rgb(210, 230, 255)
+        Note right of Graph: GDS / Cypher: Calculate Network Risk
+        Graph-->>RDE: Return Risk Score & Community Context
+    end
+
+    RDE->>Gateway: Decision (Approve / Decline / Step-up)
+    Gateway-->>Customer: Transaction Result
+
+    Note over Kafka, CMS: [COLD PATH] Investigation & Feedback
+    Kafka->>CMS: Alert for High-Risk Clusters
+    CMS->>Graph: Visual Forensic Investigation (Bloom)
+    Graph-->>CMS: Reveal Fraud Ring Infrastructure
+    CMS->>Graph: Tag as "Confirmed Fraud"
+    Note right of Graph: Knowledge Propagates to all linked Nodes
+```
+
+### Cross-Functional Data Ingestion
+
+To be effective in a financial setting, the graph must ingest data from multiple "silos" that are typically disconnected:
+
+| Data Source | Entity in Graph | Fraud Signal |
+| --- | --- | --- |
+| **KYC / Onboarding** | `Customer`, `Address`, `SSN` | Anonymized identities sharing a single physical address. |
+| **Digital Channels** | `Device`, `IP`, `UserAgent` | Account Takeover (ATO) signals (one device hitting 50 accounts). |
+| **Payment Switch** | `Transaction`, `Merchant`, `Terminal` | "Money Mule" patterns or merchant-side collusion. |
+| **Watchlists** | `OFAC`, `PEP`, `Blacklist` | Direct links to sanctioned entities or high-risk regions. |
+
+### Closed Feedback Loop
+
+One of the most critical integration points is the **Analyst-to-Graph feedback loop**:
+
+1. **Detection:** The Graph identifies a high-risk cluster using the **Louvain Community Detection** algorithm.
+2. **Investigation:** An analyst reviews the cluster in a visual forensic tool (e.g., Neo4j Bloom).
+3. **Labeling:** The analyst marks the cluster as "Confirmed Mule Ring."
+4. **Propagation:** This label is written back to the Graph. Every node connected to that ring now inherits a "High Risk" property, which immediately alerts the system the next time any of those devices or cards are used.
+
+```mermaid
+graph TD
+    %% Step 1: Automated Detection
+    subgraph Detection [1. Automated Detection]
+        LOU[Louvain Algorithm] -- Identifies --> CLUS[High-Risk Community]
+    end
+
+    %% Step 2: Human Analysis
+    subgraph Investigation [2. Human Investigation]
+        CLUS -- Surfaces to --> BLOOM[Visual Forensic Tool<br/>e.g., Neo4j Bloom]
+        BLOOM -- Evaluated by --> ANA[Fraud Analyst]
+    end
+
+    %% Step 3: Action
+    subgraph Feedback [3. Feedback & Propagation]
+        ANA -- Sets Property --> LABEL[Label: Confirmed Mule Ring]
+        LABEL -- Written to --> DB[(Neo4j Graph)]
+    end
+
+    %% Step 4: System Impact
+    subgraph Impact [4. System Impact]
+        DB -- Propagates Risk to --> ENT[All Linked Cards/Devices]
+        ENT -- Triggers --> ALERT[Real-time RDE Alert]
+    end
+
+    %% Connect the loops
+    Detection --> Investigation
+    Investigation --> Feedback
+    Feedback --> Impact
+    Impact -.->|Refines| Detection
+
+    %% Styling
+    style ANA fill:#fff2cc,stroke:#d6b656,stroke-width:2px
+    style DB fill:#d1e7ff,stroke:#004a99,stroke-width:2px
+    style ALERT fill:#ffcccc,stroke:#990000,stroke-width:2px
+```
+
+### Compliance and Data Governance
+
+In a banking environment, the architecture must account for:
+
+* **PII Masking:** Using one-way hashes (MD5/SHA256) for Card Numbers (PANs) and SSNs before they enter the graph.
+* **Right to Erasure (GDPR):** Automated scripts to prune customer nodes and their relationships upon request.
+* **Explainability:** Storing the "Path of Reason" (e.g., *Why was this flagged?*) as a property on the transaction so that the bank can provide a clear reason for declining a payment if challenged by the customer.
