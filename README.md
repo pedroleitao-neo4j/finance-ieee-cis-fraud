@@ -1,7 +1,7 @@
 # Financial Fraud Topologies using Graphs & Neo4j
 
 <p align="center">
-  <img src="renderings/deep_fraud_ring_graph.png" alt="Deep Fraud Ring" width="600px" />
+  <img src="renderings/deep_fraud_ring_graph.png" alt="Deep Fraud Ring"/>
   <br>
   <sub>A complex fraud ring showing interconnected fraudulent transactions, cards, and devices.</sub>
 </p>
@@ -14,7 +14,7 @@ By combining transaction details with identity information, the graph helps orga
 This is a classic use case for financial institutions looking to evolve from reactive "individual transaction analysis" to a proactive, network-based fraud management strategy.
 
 <p align="center">
-  <img src="renderings/fraud_island_graph.png" alt="Fraud Islands" width="600px" />
+  <img src="renderings/fraud_island_graph.png" alt="Fraud Islands"/>
   <br>
   <sub>Tightly connected groups of fraudulent activity, known as "Fraud Islands."</sub>
 </p>
@@ -52,7 +52,7 @@ In this example, we integrate two primary tables from the IEEE-CIS dataset to bu
 ### The Graph Advantage
 
 <p align="center">
-  <img src="renderings/mule_path_graph.png" alt="Mule Fraud Path" width="600px" />
+  <img src="renderings/mule_path_graph.png" alt="Mule Fraud Path"/>
   <br>
   <sub>The path of fraudulent transactions through mule cards and devices.</sub>
 </p>
@@ -70,7 +70,7 @@ By using Neo4j, we can perform **Link Analysis** to answer critical questions:
 With the data loaded, our graph schema looks like the following:
 
 <p align="center">
-  <img src="renderings/schema_graph.png" alt="Fraud Graph Schema" width="600px" />
+  <img src="renderings/schema_graph.png" alt="Fraud Graph Schema"/>
   <br>
   <sub>High-level overview of the Fraud Detection Graph Schema.</sub>
 </p>
