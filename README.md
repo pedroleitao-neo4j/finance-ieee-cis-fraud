@@ -118,7 +118,7 @@ In a modern banking stack, the Fraud Knowledge Graph extends the Core Banking Sy
 * **Downstream:** Case Management Systems (for manual review) and Real-time Decision Engines (for automated block/allow).
 
 ```mermaid
-graph TD
+graph LR
     subgraph Upstream [Data Sources & Ingestion]
         CBS[Core Banking Systems]
         PGW[Payment Gateways<br/>ISO 20022]
