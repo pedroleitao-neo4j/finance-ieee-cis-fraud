@@ -25,7 +25,7 @@ This example includes two main notebooks:
 2. **[Specific Use Cases](analysis.ipynb):** Demonstrating key fraud detection queries and algorithms, including:
    - **Exploratory Data Analysis (EDA):** Understanding the distribution of fraud across devices and identifiers.
    - **Pattern Matching:** Identifying suspicious connectivity, such as devices shared by multiple distinct credit cards.
-   - **Community Detection:** Using Graph Data Science (GDS) algorithms like Louvain to find "Fraud Islands"—tightly connected groups of fraudulent activity.
+   - **Community Detection:** Using Graph Data Science (GDS) algorithms like Louvain to find "Fraud Islands" - tightly connected groups of fraudulent activity.
    - **Visualizing Fraud:** Rendering the subgraphs of fraud rings for investigation.
 
 ### What is Graph-Based Fraud Detection and Why Does It Matter?
