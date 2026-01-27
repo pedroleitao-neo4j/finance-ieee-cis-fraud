@@ -19,7 +19,7 @@ This is a classic use case for financial institutions looking to evolve from rea
   <sub>Tightly connected groups of fraudulent activity, known as "Fraud Islands."</sub>
 </p>
 
-This example includes two main notebooks:
+This example includes three main notebooks:
 
 1. **[Data Ingestion](loader.ipynb):** Loading the IEEE-CIS dataset (Transactions and Identity) into Neo4j, creating nodes for Transactions, Cards, Devices, Emails, and Addresses.
 2. **[Specific Use Cases](analysis.ipynb):** Demonstrating key fraud detection queries and algorithms, including:
@@ -27,7 +27,7 @@ This example includes two main notebooks:
    - **Pattern Matching:** Identifying suspicious connectivity, such as devices shared by multiple distinct credit cards.
    - **Community Detection:** Using Graph Data Science (GDS) algorithms like Louvain to find "Fraud Islands" - tightly connected groups of fraudulent activity.
    - **Visualizing Fraud:** Rendering the subgraphs of fraud rings for investigation.
-3. **[Model Training & Evaluation](train_evaluate.ipynb):** Combining traditional tabular data with graph features to train a machine learning model for fraud detection.
+3. **[Model Training & Evaluation](train_evaluate.ipynb):** A working prediction model, combining traditional tabular data with graph features to train a machine learning model for fraud detection.
 
 ### What is Graph-Based Fraud Detection and Why Does It Matter?
 
@@ -104,9 +104,26 @@ Schema outline in Cypher:
 (:Transaction)-[:BILLED_TO]->(:Address)
 ```
 
-This is a strong architectural foundation. To transition this from a data science project to a **Production Banking Architecture**, you need to define how the Graph Intelligence Layer interacts with the **Core Banking System (CBS)**, the **Payment Switch**, and the **Case Management System (CMS)**.
+### The Machine Learning Angle
 
-Here is the extended documentation covering placement, integration, and banking-specific workflows.
+In **[train_evaluate.ipynb](train_evaluate.ipynb)**, we demonstrate how to supercharge specific machine learning models by feeding them graph-based features.
+
+While traditional fraud models rely on discrete rows of data (e.g., "Transaction Amount" or "Time of Day"), they often miss the rich context of relationships. By using Neo4j as a feature store, we calculate topological metrics for every node and use them to train an **[XGBoost](https://xgboost.readthedocs.io/en/stable/)** classifier.
+
+**Graph Features Generated in Neo4j (via GDS):**
+
+- **PageRank:** Measures the relative importance or "influence" of a node (e.g., a device used by many high-value cards).
+- **Degree Centrality:** Counts the number of direct connections. High degree often signals suspicious high-velocity activity.
+- **Community Size (WCC):** Derived from Weakly Connected Components. This identifies the size of the isolated group a transaction belongs to. "Fraud Rings" often appear as disjoint communities of moderate size, distinct from the giant component of legitimate users.
+
+**Data Pipeline:**
+
+- **Feature Engineering:** Execute GDS algorithms (PageRank, WCC, Degree) and write scores back to the graph.
+- **Extraction:** Query Neo4j to build a training set merging Tabular Features (Time, Amount) + Graph Features.
+- **Training:** Train an [XGBoost](https://xgboost.readthedocs.io/en/stable/) Classifier.
+- **Evaluation:** Validation using ROC-AUC and Precision-Recall Area Under Curve (PR-AUC).
+
+This "Graph-Enhanced" approach enables the model to learn sophisticated patterns, such as "A high-amount transaction from a device that is central to a community of 50 other nodes," rather than just "A high-amount transaction."
 
 ## Extended Architecture: Enterprise Banking Integration
 
