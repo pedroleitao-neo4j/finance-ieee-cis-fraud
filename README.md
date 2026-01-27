@@ -27,6 +27,7 @@ This example includes two main notebooks:
    - **Pattern Matching:** Identifying suspicious connectivity, such as devices shared by multiple distinct credit cards.
    - **Community Detection:** Using Graph Data Science (GDS) algorithms like Louvain to find "Fraud Islands" - tightly connected groups of fraudulent activity.
    - **Visualizing Fraud:** Rendering the subgraphs of fraud rings for investigation.
+3. **[Model Training & Evaluation](train_evaluate.ipynb):** Combining traditional tabular data with graph features to train a machine learning model for fraud detection.
 
 ### What is Graph-Based Fraud Detection and Why Does It Matter?
 
