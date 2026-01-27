@@ -115,6 +115,7 @@ While traditional fraud models rely on discrete rows of data (e.g., "Transaction
 - **PageRank:** Measures the relative importance or "influence" of a node (e.g., a device used by many high-value cards).
 - **Degree Centrality:** Counts the number of direct connections. High degree often signals suspicious high-velocity activity.
 - **Community Size (WCC):** Derived from Weakly Connected Components. This identifies the size of the isolated group a transaction belongs to. "Fraud Rings" often appear as disjoint communities of moderate size, distinct from the giant component of legitimate users.
+- **Node Embeddings (FastRP):** Generates vector representations of nodes capturing their structural roles in the graph.
 
 **Data Pipeline:**
 
