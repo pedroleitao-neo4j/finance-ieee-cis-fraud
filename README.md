@@ -114,12 +114,12 @@ While traditional fraud models rely on discrete rows of data (e.g., "Transaction
 
 - **PageRank:** Measures the relative importance or "influence" of a node (e.g., a device used by many high-value cards).
 - **Degree Centrality:** Counts the number of direct connections. High degree often signals suspicious high-velocity activity.
-- **Community Size (WCC):** Derived from Weakly Connected Components. This identifies the size of the isolated group a transaction belongs to. "Fraud Rings" often appear as disjoint communities of moderate size, distinct from the giant component of legitimate users.
+- **Community Size (Louvain):** Derived from Louvain community detection. This identifies the size of the isolated group a transaction belongs to. "Fraud Rings" often appear as disjoint communities of moderate size, distinct from the giant component of legitimate users.
 - **Node Embeddings (FastRP):** Generates vector representations of nodes capturing their structural roles in the graph.
 
 **Data Pipeline:**
 
-- **Feature Engineering:** Execute GDS algorithms (PageRank, WCC, Degree) and write scores back to the graph.
+- **Feature Engineering:** Execute GDS algorithms (PageRank, Louvain, Degree) and write scores back to the graph.
 - **Extraction:** Query Neo4j to build a training set merging Tabular Features (Time, Amount) + Graph Features.
 - **Training:** Train an [XGBoost](https://xgboost.readthedocs.io/en/stable/) Classifier.
 - **Evaluation:** Validation using ROC-AUC and Precision-Recall Area Under Curve (PR-AUC).
