@@ -27,7 +27,7 @@ This example includes three main notebooks:
    - **Pattern Matching:** Identifying suspicious connectivity, such as devices shared by multiple distinct credit cards.
    - **Community Detection:** Using Graph Data Science (GDS) algorithms like Louvain to find "Fraud Islands" - tightly connected groups of fraudulent activity.
    - **Visualizing Fraud:** Rendering the subgraphs of fraud rings for investigation.
-3. **[Model Training & Evaluation](train_evaluate.ipynb):** A working prediction model, combining traditional tabular data with graph features to train a machine learning model for fraud detection.
+3. **[Model Training & Evaluation](train-evaluate.ipynb):** A working prediction model, combining traditional tabular data with graph features to train a machine learning model for fraud detection, and comparing performance with and without graph features.
 
 ### What is Graph-Based Fraud Detection and Why Does It Matter?
 
@@ -106,7 +106,7 @@ Schema outline in Cypher:
 
 ### The Machine Learning Angle
 
-In **[train_evaluate.ipynb](train_evaluate.ipynb)**, we demonstrate how to supercharge specific machine learning models by feeding them graph-based features.
+In **[train-evaluate.ipynb](train-evaluate.ipynb)**, we demonstrate how to supercharge specific machine learning models by feeding them graph-based features.
 
 While traditional fraud models rely on discrete rows of data (e.g., "Transaction Amount" or "Time of Day"), they often miss the rich context of relationships. By using Neo4j as a feature store, we calculate topological metrics for every node and use them to train an **[XGBoost](https://xgboost.readthedocs.io/en/stable/)** classifier.
 
