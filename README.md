@@ -29,6 +29,16 @@ This example includes three main notebooks:
    - **Visualizing Fraud:** Rendering the subgraphs of fraud rings for investigation.
 3. **[Model Training & Evaluation](train-evaluate.ipynb):** A working prediction model, combining traditional tabular data with graph features to train a machine learning model for fraud detection, and comparing performance with and without graph features.
 
+### Performance Summary
+
+<p align="center">
+  <img src="renderings/model_comparison_roc_pr.png" alt="Model Performance Comparison"/>
+  <br>
+  <sub>ROC and Precision-Recall curves comparing Tabular vs. Graph-Enhanced models.</sub>
+</p>
+
+The graph-enhanced model shows a **significant improvement** in both ROC-AUC and PR-AUC metrics compared to the baseline tabular model, demonstrating the value of incorporating graph-based features into fraud detection systems. In particular, the Precision-Recall curve indicates a higher precision (**~6.8%**) overall for the best performing fold, which is critical in fraud detection scenarios where false positives can be costly.
+
 ### What is Graph-Based Fraud Detection and Why Does It Matter?
 
 Modern financial systems process millions of transactions daily. It is practically impossible for analysts to review every flag manually, and traditional tabular models often miss the "forest for the trees."
